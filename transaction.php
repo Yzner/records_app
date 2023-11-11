@@ -31,7 +31,8 @@
     require("Config/db.php");
 
     //get the value sent over search form
-    $search = $_GET['search'];
+    $search = isset($_GET['search']) ? $_GET['search'] : '';
+
 
     //define total number of results you want per page
     $results_per_page = 10;
@@ -128,6 +129,11 @@
                                                 <td><?php echo $transaction['office_name']; ?></td>
                                                 <td><?php echo $transaction['employee_fullname']; ?></td>
                                                 <td><?php echo $transaction['remarks']; ?></td>
+                                                <td>
+                                                    <a href="/transaction-edit.php?id=<?php echo isset($transaction['documentcode']) ? $transaction['documentcode'] : ''; ?>">
+                                                        <button type="submit" class="btn btn-warning btn-fill pull-right">Edit</button>
+                                                    </a>
+                                                </td>
                                             </tr>
                                             <?php endforeach ?>
                                         </tbody>

@@ -26,38 +26,47 @@
 
 </head>
 <body>
-    <?php 
-    require('config/config.php');
-    require('config/db.php');
 
-    //get value sent over
+<?php
+    require("Config/config.php");
+    require("Config/db.php");
+
+    // Get the employee ID from the query parameters
     $id = $_GET['id'];
 
-    //create query
-    $query = "SELECT * FROM office WHERE id=" . $id;
+    // Check if the delete button is clicked
+    if (isset($_POST["delete"])) {
+        // Create the delete query
+        $deleteQuery = "DELETE FROM employee WHERE id=" . $id;
 
-    //get result of query
+        // Execute the delete query
+        if (mysqli_query($conn, $deleteQuery)) {
+            // Redirect to a page after successful deletion
+            header("Location: index.php");
+            exit();
+        } else {
+            echo "ERROR: " . mysqli_error($conn);
+        }
+    }
+
+    // Fetch the employee data for displaying in the form
+    $query = "SELECT * FROM employee WHERE id=" . $id;
     $result = mysqli_query($conn, $query);
-    $conv = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    if(!empty($conv)){
-        //fetch data
-        $office = $conv[0];
-        $name = $office['name'];
-        $contactnum = $office['contactnum'];
-        $email = $office['email'];
-        $address = $office['address'];
-        $city = $office['city'];
-        $country = $office['country'];
-        $postal = $office['postal'];
-    } 
-    
-    
-    //free result
-    mysqli_free_result($result);
-    //close connection
-    mysqli_close($conn);
-    ?>
 
+    if (mysqli_num_rows($result) > 0) {
+        $employee = mysqli_fetch_array($result);
+        $lastname = $employee["lastname"];
+        $firstname = $employee["firstname"];
+        $office_id = $employee["office_id"];
+        $address = $employee["address"];
+    }
+
+    // Free the result
+    mysqli_free_result($result);
+
+    // Close the connection
+    mysqli_close($conn);
+?>
     <div class="wrapper">
         <div class="sidebar" data-color="purple" data-image="assets/img/sidebar-5.jpg">
 
@@ -73,22 +82,20 @@
     require("config/db.php");
 
     if(isset($_POST["submit"])){
-        $name = mysqli_real_escape_string($conn, $_POST["name"]);
-        $contactnum = mysqli_real_escape_string($conn, $_POST["contactnum"]);
-        $email = mysqli_real_escape_string($conn, $_POST["email"]);
+        $lastname = mysqli_real_escape_string($conn, $_POST["lastname"]);
+        $firstname = mysqli_real_escape_string($conn, $_POST["firstname"]);
+        $office_id = mysqli_real_escape_string($conn, $_POST["office"]);
         $address = mysqli_real_escape_string($conn, $_POST["address"]);
-        $city = mysqli_real_escape_string($conn, $_POST["city"]);
-        $country = mysqli_real_escape_string($conn, $_POST["country"]);
-        $postal = mysqli_real_escape_string($conn, $_POST["postal"]);
-
-        $query = "UPDATE office SET name='$name', contactnum='$contactnum', email='$email', address='$address', city='$city', country='$country', postal='$postal'
-               WHERE id=" . $id;
+       
+        $query = "UPDATE employee SET lastname='$lastname', firstname='$firstname', office_id='$office_id', address='$address'
+        WHERE id=" . $id;
         
 
         if(mysqli_query($conn, $query)){
             
         }else{
             echo "ERROR: ".mysqli_error($conn);
+            echo $query;
         }
     }
 ?>    
@@ -100,70 +107,66 @@
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4 class="card-title">Edit Profile</h4>
+                                <h4 class="card-title">Delete Profile</h4>
                             </div>
                             <div class="content">
                                 <form method="POST" action="<?php $_SERVER['PHP_SELF']; ?>">
                                     <div class="row">
-                                        <div class="col-md-5 pr-1">
+                                    <div class="col-md-4 pr-1">
                                             <div class="form-group">
-                                                <label>Office Name</label>
-                                                <input type="text" class="form-control" name="name" value="<?php echo $name;?> ">
+                                                <label>Last Name</label>
+                                                <input name="lastname" type="text" class="form-control" value="<?php echo $lastname;?> ">
                                             </div>
-                                        </div>
-                                        <div class="col-md-3 px-1">
-                                            <div class="form-group">
-                                                <label>Contact Number</label>
-                                                <input type="text" class="form-control" name="contactnum" value="<?php echo $contactnum;?> ">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="exampleInputEmail1">Email address</label>
-                                                <input type="email" class="form-control" name="email" value="<?php echo $email;?> ">
-                                            </div>
-                                        </div>
                                     </div>
+                                    <div class="col-md-4 px-1">
+                                            <div class="form-group">
+                                                <label>First Name</label>
+                                                <input name="firstname" type="text" class="form-control" value="<?php echo $firstname;?> ">
+                                            </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4 px-1">
+                                            <div class="form-group">
+                                                <label for="exampleInputEmail">Office</label>
+                                                <select class="form-control" name="office">
+                                                    <option>Select....</option>
+                                                    <?php
+                                                        $query = "SELECT id, name FROM office";
+                                                        $result = mysqli_query($conn,$query);
+                                                        while ($row=mysqli_fetch_array($result)) {
+                                                            if ($row['id'] == $office_id){
+                                                                echo "<option value=" . $row['id'] . "selected>" . $row['name'] . "</option>";
+                                                            }else{
+                                                                echo "<option value=" . $row['id'] . ">" . $row['name'] . "</option>";
+                                                            }
+                                                            
+                                                        }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
 
+                                    </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <div class="form-group">
-                                                <label>Address / Building</label>
-                                                <input type="text" class="form-control" name="address" value="<?php echo $address;?> ">
-                                            </div>
+                                                <div class="form-group">
+                                                    <label>Address / Building</label>
+                                                    <input name="address" type="text" class="form-control" value="<?php echo $address;?> ">
+                                                </div>
                                         </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-md-4 pr-1">
-                                            <div class="form-group">
-                                                <label>City</label>
-                                                <input type="text" class="form-control" name="city" value="<?php echo $city;?> ">
-                                            </div>
                                         </div>
-                                        <div class="col-md-4 pr-1">
-                                            <div class="form-group">
-                                                <label>Country</label>
-                                                <input type="text" class="form-control" name="country" value="<?php echo $country;?> ">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4 pr-1">
-                                            <div class="form-group">
-                                                <label>Postal Code</label>
-                                                <input type="text" class="form-control" name="postal" value="<?php echo $postal;?> ">
-                                            </div>
-                                        </div>
-                                    </div>
-
                                     <button type="submit" name="submit" value="Submit" class="btn btn-info btn-fill pull-right">Save</button>
                                     <div class="clearfix"></div>
                                 </form>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
+
+
         <footer class="footer">
             <div class="container-fluid">
                 <nav class="pull-left">

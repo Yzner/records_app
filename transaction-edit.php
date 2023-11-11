@@ -27,23 +27,45 @@
 </head>
 <body>
 
-<div class="wrapper">
-    <div class="sidebar" data-color="purple" data-image="assets/img/sidebar-5.jpg">
+<?php
+    require("Config/config.php");
+    require("Config/db.php");
 
-    <!--
+    //get value sent over
+    $id = $_GET['id'];
 
-        Tip 1: you can change the color of the sidebar using: data-color="blue | azure | green | orange | red | purple"
-        Tip 2: you can also add an image using data-image tag
+    //create query
+    $query = "SELECT * FROM employee WHERE id=" . $id;
+    //get result of query
+    $result = mysqli_query($conn, $query);
+    $conv = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    if(!empty($conv)){
+        //fetch data
+        $transaction = $conv[0];
+        $documentcode = $transaction['documentcode'];
+        $action = $transaction['action'];
+        $remarks = $transaction['remarks'];
+        $employee_id = $transaction['employee_id'];
+        $office_id = $transaction['office_id'];
+    }
 
-    -->
+    // free result
+    mysqli_free_result($result);
 
-    <div class="sidebar-wrapper">
-    <?php include("BS3/sidebar.php"); ?>
-    </div>
-    </div>
+    //close connection
+    mysqli_close($conn);
+?>
 
-    <div class="main-panel">
-    <?php include("BS3/navbar.php"); ?>
+    <div class="wrapper">
+        <div class="sidebar" data-color="purple" data-image="assets/img/sidebar-5.jpg">
+
+        <div class="sidebar-wrapper">
+        <?php include("BS3/sidebar.php"); ?>
+        </div>
+        </div>
+
+        <div class="main-panel">
+        <?php include("BS3/navbar.php"); ?>
 <?php 
     require("config/config.php");
     require("config/db.php");
@@ -54,10 +76,11 @@
         $remarks = mysqli_real_escape_string($conn, $_POST['remarks']);
         $employee_id = mysqli_real_escape_string($conn, $_POST['employee_id']);
         $office_id = mysqli_real_escape_string($conn, $_POST['office_id']);
-
-        $query = "INSERT INTO transaction(documentcode,action,remarks,employee_id,office_id)
-        VALUES('$documentcode', '$action', '$remarks', '$employee_id','$office_id')";
+       
+        $query = "UPDATE employee SET documentcode='$doccumentcode', action='$action', remarks='$remarks', employee_id='$employee_id', office_id='$office_id'
+        WHERE id=" . $id;
         
+
         if(mysqli_query($conn, $query)){
             
         }else{
@@ -73,72 +96,56 @@
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4 class="card-title">Transactions</h4>
+                                <h4 class="card-title">Edit Profile</h4>
                             </div>
                             <div class="content">
                                 <form method="POST" action="<?php $_SERVER['PHP_SELF']; ?>">
                                     <div class="row">
-                                    <div class="col-md-3 pr-1">
+                                    <div class="col-md-5 pr-1">
                                             <div class="form-group">
                                                 <label>Document Code</label>
-                                                <input name="documentcode" type="text" class="form-control">
+                                                <input type="text" class="form-control" name="name" value="<?php echo $documentcode;?> ">
                                             </div>
-                                    </div>
-                                    <div class="col-md-3 px-1">
+                                        </div>
+
+                                        <div class="col-md-4 px-1">
                                             <div class="form-group">
-                                                <label>Action</label>
-                                                <select class="form-control" input name="firstname">
-                                                    <option>IN</option>
-                                                    <option>OUT</option>
-                                                    <option>COMPLETE</option>
+                                                <label for="exampleInputEmail">Action</label>
+                                                <select class="form-control" name="office">
+                                                <option value=1>IN</option><option value=2>OUT</option><option value=3>Complete</option>
+                                                    <?php
+                                                        $query = "SELECT id, name FROM office";
+                                                        $result = mysqli_query($conn,$query);
+                                                        while ($row=mysqli_fetch_array($result)) {
+                                                            if ($row['id'] == $action){
+                                                                echo "<option value=" . $row['id'] . "selected>" . $row['name'] . "</option>";
+                                                            }else{
+                                                                echo "<option value=" . $row['id'] . ">" . $row['name'] . "</option>";
+                                                            }
+                                                            
+                                                        }
+                                                    ?>
                                                 </select>
                                             </div>
                                         </div>
-                                    
-                                        <div class="col-md-6 pl-1">
+
+                                        <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="exampleInputEmail1">Remarks</label>
-                                                <input name="remarks" type="text" class="form-control">
+                                                <input type="email" class="form-control" name="email" value="<?php echo $remarks;?> ">
                                             </div>
                                         </div>
                                     </div>
 
-                                        <div class="row">
-                                            <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-12">
                                             <div class="form-group">
-                                                <label for="exampleInputEmail1">Employee</label>
-                                                <select class="form-control" name='employee_id'>
-                                                <option>Select.....</option>
-                                                <?php
-                                                     $query = "SELECT id, CONCAT(lastname,', ',firstname) as Employee from records_app.employee";
-                                                     $result = mysqli_query($conn, $query);
-                                                     while ($row = mysqli_fetch_array($result)) {
-                                                        echo "<option value=" . $row['id'] . ">" . $row['Employee'] . "</option>";
-                                                     }
-                                                ?>
-                                                </select>
+                                                <label>Employee Id</label>
+                                                <input type="text" class="form-control" name="address" value="<?php echo $employee_id;?> ">
                                             </div>
-                                        </div>
-
-                                        <div class="col-md-6 pr-1">
-                                            <div class="form-group">
-                                                <label for="exampleInputEmail1">Office</label>
-                                                <select class="form-control" name='office_id'>
-                                                <option>Select.....</option>
-                                                <?php
-                                                     $query = "SELECT id, name FROM records_app.office";
-                                                     $result = mysqli_query($conn, $query);
-                                                     while ($row = mysqli_fetch_array($result)) {
-                                                        echo "<option value=" . $row['id'] . ">" . $row['name'] . "</option>";
-                                                     }
-                                                ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                        
                                         </div>
                                     </div>
+
                                     <button type="submit" name="submit" value="Submit" class="btn btn-info btn-fill pull-right">Save</button>
                                     <div class="clearfix"></div>
                                 </form>
@@ -147,7 +154,6 @@
                     </div>
 
                 </div>
-                                    
             </div>
         </div>
 
