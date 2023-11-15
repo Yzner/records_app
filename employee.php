@@ -112,6 +112,11 @@
                                                         <button type="submit" class="btn btn-warning btn-fill pull-right">Edit</button>
                                                     </a>
                                                 </td>
+                                                <td>
+                                                    <a href="/employee-delete.php?id=<?php echo $employee['id']; ?>">
+                                                        <button type="submit" class="btn btn-danger btn-fill pull-right">Delete</button>
+                                                    </a>
+                                                </td>
                                             </tr>
                                             <?php endforeach ?>
                                         </tbody>

@@ -87,7 +87,7 @@
                                     <div class="col-md-3 px-1">
                                             <div class="form-group">
                                                 <label>Action</label>
-                                                <select class="form-control" input name="firstname">
+                                                <select class="form-control" name="action">
                                                     <option>IN</option>
                                                     <option>OUT</option>
                                                     <option>COMPLETE</option>

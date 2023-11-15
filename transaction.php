@@ -129,11 +129,6 @@
                                                 <td><?php echo $transaction['office_name']; ?></td>
                                                 <td><?php echo $transaction['employee_fullname']; ?></td>
                                                 <td><?php echo $transaction['remarks']; ?></td>
-                                                <td>
-                                                    <a href="/transaction-edit.php?id=<?php echo isset($transaction['documentcode']) ? $transaction['documentcode'] : ''; ?>">
-                                                        <button type="submit" class="btn btn-warning btn-fill pull-right">Edit</button>
-                                                    </a>
-                                                </td>
                                             </tr>
                                             <?php endforeach ?>
                                         </tbody>
